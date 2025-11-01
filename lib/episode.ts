@@ -190,7 +190,15 @@ Write a natural, engaging dialogue between Greptice and Forky. Target 600-700 wo
   });
 
   // Parse dialogue
+  console.log('Raw LLM script output (first 500 chars):', response.content.substring(0, 500));
   const dialogue = parseDialogue(response.content);
+  console.log(`Parsed ${dialogue.length} dialogue entries from script`);
+
+  if (dialogue.length === 0) {
+    console.error('WARNING: No dialogue entries parsed! Raw script format may be incorrect.');
+    console.log('Full script text:', response.content);
+  }
+
   const wordCount = dialogue.reduce((count, entry) => count + entry.text.split(/\s+/).length, 0);
   const estimatedDuration = Math.ceil((wordCount / 150) * 60); // 150 words per minute
 
@@ -203,19 +211,31 @@ Write a natural, engaging dialogue between Greptice and Forky. Target 600-700 wo
 
 /**
  * Parse script text into dialogue array
+ * Handles multiple format variations from different LLMs
  */
 function parseDialogue(scriptText: string): Array<{ speaker: 'Greptice' | 'Forky'; text: string }> {
   const lines = scriptText.split('\n');
   const dialogue: Array<{ speaker: 'Greptice' | 'Forky'; text: string }> = [];
 
   for (const line of lines) {
-    const grepticeMatch = line.match(/^GREPTICE:\s*(.+)$/i);
-    const forkyMatch = line.match(/^FORKY:\s*(.+)$/i);
+    // Try different format patterns:
+    // - GREPTICE: text
+    // - **GREPTICE:** text
+    // - Greptice: text
+    // - [GREPTICE] text
+    const grepticeMatch = line.match(/^(?:\*\*)?(?:\[)?(?:GREPTICE|Greptice)(?:\])?(?:\*\*)?:\s*(.+)$/i);
+    const forkyMatch = line.match(/^(?:\*\*)?(?:\[)?(?:FORKY|Forky)(?:\])?(?:\*\*)?:\s*(.+)$/i);
 
-    if (grepticeMatch) {
-      dialogue.push({ speaker: 'Greptice', text: grepticeMatch[1].trim() });
-    } else if (forkyMatch) {
-      dialogue.push({ speaker: 'Forky', text: forkyMatch[1].trim() });
+    if (grepticeMatch && grepticeMatch[1]) {
+      const text = grepticeMatch[1].trim().replace(/^\*\*|\*\*$/g, ''); // Remove markdown bold
+      if (text.length > 0) {
+        dialogue.push({ speaker: 'Greptice', text });
+      }
+    } else if (forkyMatch && forkyMatch[1]) {
+      const text = forkyMatch[1].trim().replace(/^\*\*|\*\*$/g, '');
+      if (text.length > 0) {
+        dialogue.push({ speaker: 'Forky', text });
+      }
     }
   }
 
