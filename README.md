@@ -4,6 +4,14 @@
 
 ---
 
+## Demo
+
+🎥 **[Watch Demo Video](https://drive.google.com/file/d/1oNUbcCc-55JB_6IfWGSHOViq_0xEMVk9/view?usp=sharing)**
+
+🎧 **[Listen to Sample Episode](https://drive.google.com/file/d/18eIfSyxtbGV29d6ucapePlIsAgMqIBvS/view?usp=sharing)** - SAFE-MCP repository episode
+
+---
+
 ## Overview
 
 Greptalk uses Greptile AI to analyze codebases and generates entertaining two-voice podcast episodes that:
