@@ -10,6 +10,11 @@ interface Citation {
   summary?: string;
 }
 
+interface DialogueLine {
+  speaker: 'Greptice' | 'Forky';
+  text: string;
+}
+
 interface EpisodeData {
   repository: string;
   branch: string;
@@ -20,6 +25,11 @@ interface EpisodeData {
   microTask: string;
   citations: Citation[];
   citationCount: number;
+  script?: {
+    dialogue: DialogueLine[];
+    wordCount: number;
+    estimatedDuration: number;
+  };
 }
 
 export default function Home() {
@@ -214,12 +224,44 @@ export default function Home() {
               </p>
             </div>
 
+            {/* Podcast Script */}
+            {episodeData.script && (
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Podcast Script</h3>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {episodeData.script.wordCount} words · ~{Math.floor(episodeData.script.estimatedDuration / 60)}:{String(episodeData.script.estimatedDuration % 60).padStart(2, '0')} min
+                  </div>
+                </div>
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 space-y-4 max-h-96 overflow-y-auto">
+                  {episodeData.script.dialogue.map((line, i) => (
+                    <div key={i} className="flex gap-3">
+                      <div className="flex-shrink-0">
+                        <span
+                          className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
+                            line.speaker === 'Greptice'
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                              : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+                          }`}
+                        >
+                          {line.speaker}
+                        </span>
+                      </div>
+                      <p className="text-gray-700 dark:text-gray-300 flex-1">
+                        {line.text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Note */}
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                <strong>Phase 0.2:</strong> Greptile Integration + Citation Enrichment Complete!
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+              <p className="text-sm text-green-800 dark:text-green-200">
+                <strong>Phase 0.3:</strong> Episode Generation Pipeline Complete!
                 <br />
-                <strong>Next:</strong> Phase 0.3 - TTS Audio Generation
+                <strong>Next:</strong> Phase 0.4 - TTS Audio Generation
               </p>
             </div>
           </div>
@@ -227,7 +269,7 @@ export default function Home() {
 
         {/* Footer */}
         <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-          Phase 0.2: Greptile Integration with Citation Fallback
+          Phase 0.3: Episode Generation with LLM-Powered Script
         </p>
       </main>
     </div>

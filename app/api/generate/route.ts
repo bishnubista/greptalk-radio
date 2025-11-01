@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { indexRepository, waitForIndexing } from '@/lib/greptile';
 import { parseGitHubUrl } from '@/lib/github';
 import { generateEpisodeData, validateEpisodeData } from '@/lib/citations';
+import { generateOutline, generateScript, validateOutline } from '@/lib/episode';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60; // 60 seconds for Vercel
@@ -63,7 +64,27 @@ export async function POST(request: Request) {
       );
     }
 
-    // Return episode data
+    // Step 5: Generate episode outline using LLM
+    console.log('Generating episode outline...');
+    const outline = await generateOutline(episodeData);
+
+    // Validate outline
+    const outlineValidation = validateOutline(outline);
+    if (!outlineValidation.valid) {
+      return NextResponse.json(
+        {
+          error: 'Outline validation failed',
+          details: outlineValidation.errors,
+        },
+        { status: 422 }
+      );
+    }
+
+    // Step 6: Generate podcast script
+    console.log('Generating podcast script...');
+    const script = await generateScript(outline);
+
+    // Return complete episode
     return NextResponse.json({
       success: true,
       data: {
@@ -76,6 +97,12 @@ export async function POST(request: Request) {
         microTask: episodeData.microTask,
         citations: episodeData.citations,
         citationCount: episodeData.citations.length,
+        outline,
+        script: {
+          dialogue: script.dialogue,
+          wordCount: script.wordCount,
+          estimatedDuration: script.estimatedDuration,
+        },
       },
     });
   } catch (error) {
