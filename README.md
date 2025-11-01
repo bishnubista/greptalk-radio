@@ -192,24 +192,58 @@ Every episode **must** include:
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, Shadcn/ui
-- **Backend**: Next.js API routes
-- **AI**: Greptile (codebase analysis), OpenAI/Claude (scripts), ElevenLabs/PlayHT (TTS)
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **Backend**: Next.js API routes (60s timeout)
+- **AI**: Greptile (codebase analysis), OpenAI/Claude (scripts), ElevenLabs (TTS)
 - **Deployment**: Vercel
-- **Storage**: S3 (post-hackathon), in-memory (MVP)
+- **Storage**: Base64 embedding (no external storage needed for MVP)
+
+---
+
+## Deployment
+
+### Vercel (Recommended)
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# Set environment variables in Vercel dashboard:
+# - GREPTILE_API_KEY
+# - GITHUB_TOKEN
+# - OPENAI_API_KEY (or ANTHROPIC_API_KEY)
+# - ELEVENLABS_API_KEY (optional, for audio)
+```
+
+**Production URL**: Will be provided after deployment
 
 ---
 
 ## Demo Script (2 Min)
 
-1. **Intro (20s)**: "Greptalk turns any GitHub repo into a podcast. Let me show you."
-2. **Paste URL (10s)**: Paste repo URL → Click "Generate Episode"
-3. **Show Progress (10s)**: "Greptice is reading the repo..." (spinner)
-4. **Play Audio (30s)**: Play first 30 seconds with citations
-5. **Show Transcript (30s)**: Scroll to micro-task section
-6. **Show Citation (20s)**: Click citation, show grounding
-7. **CTA (10s)**: Point at "Create PR ($9)" button
-8. **Wrap (10s)**: "Free to generate, pay only for PRs. Questions?"
+**Test Repo Suggestions**:
+- Small: `https://github.com/octocat/Hello-World`
+- Medium: `https://github.com/vercel/next.js`
+
+**Demo Flow**:
+1. **Intro (20s)**: "Greptalk turns any GitHub repo into a podcast with citations. Watch."
+2. **Paste URL (10s)**: Paste `octocat/Hello-World` → Check "Generate audio" → Click "Generate"
+3. **Show Progress (10s)**: Wait for "Greptice is reading the repo..."
+4. **Review Data (20s)**: Scroll through Citations, Hotspots, Patterns sections
+5. **Play Audio (30s)**: Click play on audio player, listen to Greptice & Forky dialogue
+6. **Show Script (20s)**: Scroll to podcast script with speaker labels
+7. **Micro-Task (20s)**: Show 5-step contributor task
+8. **CTA (10s)**: "Create PR" button (coming in Phase 2)
+9. **Wrap (10s)**: "All grounded in real code citations. Questions?"
+
+**Key Points to Highlight**:
+- ✅ Real citations with line numbers (e.g., `README:L1-L5`)
+- ✅ Two-voice podcast (Greptice: analytical, Forky: enthusiastic)
+- ✅ MP3 download available
+- ✅ All generated in ~30-60 seconds
 
 ---
 
