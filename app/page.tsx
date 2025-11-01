@@ -162,7 +162,10 @@ export default function Home() {
               </h3>
               <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-2">
                 {episodeData.citations.map((citation, i) => (
-                  <div key={i} className="flex items-start gap-2">
+                  <div
+                    key={`${citation.filepath}-${citation.lineStart || i}`}
+                    className="flex items-start gap-2"
+                  >
                     <span className="text-blue-600 dark:text-blue-400 font-mono text-sm">
                       {i + 1}.
                     </span>

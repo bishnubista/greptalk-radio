@@ -39,9 +39,9 @@ export async function POST(request: Request) {
     console.log(`Indexing repository: ${owner}/${repo}...`);
     await indexRepository(greptileRepo);
 
-    // Step 2: Wait for indexing to complete
+    // Step 2: Wait for indexing to complete (55s to stay within 60s API timeout)
     console.log('Waiting for indexing to complete...');
-    await waitForIndexing(greptileRepo, 180000, (status, filesProcessed) => {
+    await waitForIndexing(greptileRepo, 55000, (status, filesProcessed) => {
       console.log(`Status: ${status}, Files: ${filesProcessed}`);
     });
 

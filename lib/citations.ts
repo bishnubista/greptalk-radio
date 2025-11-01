@@ -183,8 +183,29 @@ export function validateEpisodeData(data: EpisodeData): {
     errors.push(`Only ${data.citations.length} citations (need ≥3)`);
   }
 
-  // Check micro-task has steps (simple heuristic)
-  const stepCount = (data.microTask.match(/\d\./g) || []).length;
+  // Check micro-task has steps (support multiple list formats)
+  // Match: numbered (1.), bulleted (-, *, •), lettered (a), A.), or line breaks as fallback
+  const stepPatterns = [
+    /\d+\./g,           // 1. 2. 3.
+    /^[-*•]\s/gm,       // - or * or • at start of line
+    /[a-z]\)/gi,        // a) b) c) or A) B) C)
+    /[A-Z]\./g,         // A. B. C.
+  ];
+
+  let stepCount = 0;
+  for (const pattern of stepPatterns) {
+    const matches = data.microTask.match(pattern);
+    if (matches && matches.length > stepCount) {
+      stepCount = matches.length;
+    }
+  }
+
+  // Fallback: count newlines if no list markers found (at least 5 lines)
+  if (stepCount === 0) {
+    const lines = data.microTask.split('\n').filter(line => line.trim().length > 10);
+    stepCount = lines.length;
+  }
+
   if (stepCount < 5) {
     errors.push(`Micro-task has ${stepCount} steps (need 5)`);
   }

@@ -54,6 +54,13 @@ export async function fetchFileContent(
 }
 
 /**
+ * Escape special regex characters in a string
+ */
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
  * Find line numbers for a function/class/pattern in file content
  * Returns start and end line numbers
  */
@@ -63,12 +70,15 @@ export function findLineNumbers(
 ): { start: number; end: number } | null {
   const lines = content.split('\n');
 
+  // Escape special regex characters to prevent injection
+  const escapedTerm = escapeRegex(searchTerm);
+
   // Try to find function/class definition
   const patterns = [
-    new RegExp(`^\\s*(function|const|let|var)\\s+${searchTerm}`, 'm'),
-    new RegExp(`^\\s*class\\s+${searchTerm}`, 'm'),
-    new RegExp(`^\\s*(export\\s+)?(async\\s+)?function\\s+${searchTerm}`, 'm'),
-    new RegExp(`^\\s*${searchTerm}\\s*[:=]`, 'm'), // Arrow functions, object methods
+    new RegExp(`^\\s*(function|const|let|var)\\s+${escapedTerm}`, 'm'),
+    new RegExp(`^\\s*class\\s+${escapedTerm}`, 'm'),
+    new RegExp(`^\\s*(export\\s+)?(async\\s+)?function\\s+${escapedTerm}`, 'm'),
+    new RegExp(`^\\s*${escapedTerm}\\s*[:=]`, 'm'), // Arrow functions, object methods
   ];
 
   for (const pattern of patterns) {
@@ -96,12 +106,9 @@ export function findLineNumbers(
 
 /**
  * Find the end of a code block (function, class, etc.)
- * Simple heuristic: look for closing brace with matching indentation
+ * Simple heuristic: look for closing brace with matching brace count
  */
 function findBlockEnd(lines: string[], startIndex: number): number {
-  const startLine = lines[startIndex];
-  const startIndent = startLine.search(/\S/);
-
   let braceCount = 0;
   let inBlock = false;
 
