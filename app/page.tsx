@@ -246,6 +246,20 @@ export default function Home() {
               <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                 {episodeData.microTask}
               </p>
+
+              {/* PR Creation Stub */}
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  disabled
+                  className="relative px-6 py-3 bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 font-medium rounded-lg cursor-not-allowed"
+                  title="Coming soon in Phase 2!"
+                >
+                  Create PR ($9) - Coming Soon
+                </button>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Auto-generate a PR for this task (Phase 2 feature)
+                </p>
+              </div>
             </div>
 
             {/* Audio Player */}
