@@ -3,13 +3,14 @@ import { indexRepository, waitForIndexing } from '@/lib/greptile';
 import { parseGitHubUrl } from '@/lib/github';
 import { generateEpisodeData, validateEpisodeData } from '@/lib/citations';
 import { generateOutline, generateScript, validateOutline } from '@/lib/episode';
+import { generateEpisodeAudio } from '@/lib/tts';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60; // 60 seconds for Vercel
 
 export async function POST(request: Request) {
   try {
-    const { repoUrl } = await request.json();
+    const { repoUrl, includeAudio = false } = await request.json();
 
     if (!repoUrl) {
       return NextResponse.json(
@@ -84,6 +85,29 @@ export async function POST(request: Request) {
     console.log('Generating podcast script...');
     const script = await generateScript(outline);
 
+    // Step 7: Generate audio (optional, can be slow)
+    let audio = null;
+    if (includeAudio && process.env.ELEVENLABS_API_KEY) {
+      console.log('Generating audio with TTS...');
+      try {
+        const audioResult = await generateEpisodeAudio(
+          script.dialogue,
+          undefined,
+          (current, total, speaker) => {
+            console.log(`Generating audio segment ${current}/${total} (${speaker})`);
+          }
+        );
+        audio = {
+          base64: audioResult.audioBase64,
+          duration: audioResult.duration,
+          segmentCount: audioResult.segmentCount,
+        };
+      } catch (audioError) {
+        console.error('Audio generation failed:', audioError);
+        // Continue without audio rather than failing the whole request
+      }
+    }
+
     // Return complete episode
     return NextResponse.json({
       success: true,
@@ -103,6 +127,7 @@ export async function POST(request: Request) {
           wordCount: script.wordCount,
           estimatedDuration: script.estimatedDuration,
         },
+        audio,
       },
     });
   } catch (error) {

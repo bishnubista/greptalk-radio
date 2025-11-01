@@ -30,10 +30,16 @@ interface EpisodeData {
     wordCount: number;
     estimatedDuration: number;
   };
+  audio?: {
+    base64: string;
+    duration: number;
+    segmentCount: number;
+  } | null;
 }
 
 export default function Home() {
   const [repoUrl, setRepoUrl] = useState('');
+  const [includeAudio, setIncludeAudio] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState('');
   const [error, setError] = useState('');
@@ -63,7 +69,10 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ repoUrl: repoUrl.trim() }),
+        body: JSON.stringify({
+          repoUrl: repoUrl.trim(),
+          includeAudio,
+        }),
       });
 
       const result = await response.json();
@@ -136,6 +145,21 @@ export default function Home() {
                 </div>
               </div>
             )}
+
+            {/* Audio Option */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="include-audio"
+                checked={includeAudio}
+                onChange={(e) => setIncludeAudio(e.target.checked)}
+                disabled={isLoading}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label htmlFor="include-audio" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Generate audio with TTS (ElevenLabs - slower, requires API key)
+              </label>
+            </div>
 
             {/* Generate Button */}
             <button
@@ -224,6 +248,36 @@ export default function Home() {
               </p>
             </div>
 
+            {/* Audio Player */}
+            {episodeData.audio && (
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Episode Audio</h3>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {episodeData.audio.segmentCount} segments · {Math.floor(episodeData.audio.duration / 60000)}:{String(Math.floor((episodeData.audio.duration % 60000) / 1000)).padStart(2, '0')} min
+                  </div>
+                </div>
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+                  <audio
+                    controls
+                    className="w-full"
+                    src={`data:audio/mpeg;base64,${episodeData.audio.base64}`}
+                  >
+                    Your browser does not support the audio element.
+                  </audio>
+                  <div className="mt-4 flex gap-2">
+                    <a
+                      href={`data:audio/mpeg;base64,${episodeData.audio.base64}`}
+                      download={`${episodeData.repository.replace('/', '-')}-episode.mp3`}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      Download MP3
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Podcast Script */}
             {episodeData.script && (
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
@@ -259,9 +313,9 @@ export default function Home() {
             {/* Note */}
             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
               <p className="text-sm text-green-800 dark:text-green-200">
-                <strong>Phase 0.3:</strong> Episode Generation Pipeline Complete!
+                <strong>Phase 0.4:</strong> TTS Audio Generation Complete!
                 <br />
-                <strong>Next:</strong> Phase 0.4 - TTS Audio Generation
+                <strong>Features:</strong> ElevenLabs multi-voice TTS, Base64 audio embedding, MP3 download
               </p>
             </div>
           </div>
@@ -269,7 +323,7 @@ export default function Home() {
 
         {/* Footer */}
         <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-          Phase 0.3: Episode Generation with LLM-Powered Script
+          Phase 0.4: TTS Audio Generation with ElevenLabs
         </p>
       </main>
     </div>
