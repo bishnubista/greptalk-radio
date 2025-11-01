@@ -2,11 +2,32 @@
 
 import { useState } from 'react';
 
+interface Citation {
+  filepath: string;
+  lineStart?: number;
+  lineEnd?: number;
+  functionName?: string;
+  summary?: string;
+}
+
+interface EpisodeData {
+  repository: string;
+  branch: string;
+  purpose: string;
+  entrypoints: string;
+  hotspots: string;
+  patterns: string;
+  microTask: string;
+  citations: Citation[];
+  citationCount: number;
+}
+
 export default function Home() {
   const [repoUrl, setRepoUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState('');
   const [error, setError] = useState('');
+  const [episodeData, setEpisodeData] = useState<EpisodeData | null>(null);
 
   const handleGenerate = async () => {
     if (!repoUrl.trim()) {
@@ -22,13 +43,27 @@ export default function Home() {
     }
 
     setError('');
+    setEpisodeData(null);
     setIsLoading(true);
-    setProgress('Preparing to analyze repository...');
+    setProgress('Indexing repository with Greptile...');
 
     try {
-      // TODO: Implement actual API call in Phase 0.2
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setProgress('Analysis complete! (This is a placeholder)');
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ repoUrl: repoUrl.trim() }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to generate episode');
+      }
+
+      setProgress('✓ Episode data generated!');
+      setEpisodeData(result.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -36,9 +71,16 @@ export default function Home() {
     }
   };
 
+  const formatCitation = (citation: Citation): string => {
+    if (citation.lineStart && citation.lineEnd) {
+      return `${citation.filepath}:L${citation.lineStart}-L${citation.lineEnd}`;
+    }
+    return citation.filepath;
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <main className="flex flex-col gap-8 items-center max-w-2xl w-full">
+      <main className="flex flex-col gap-8 items-center max-w-4xl w-full">
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-2">
@@ -103,9 +145,89 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Episode Data Display */}
+        {episodeData && (
+          <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 space-y-6">
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4">
+              <h2 className="text-2xl font-bold">Episode Data</h2>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {episodeData.repository} ({episodeData.branch})
+              </span>
+            </div>
+
+            {/* Citations */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">
+                Citations ({episodeData.citationCount})
+              </h3>
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-2">
+                {episodeData.citations.map((citation, i) => (
+                  <div
+                    key={`${citation.filepath}-${citation.lineStart || i}`}
+                    className="flex items-start gap-2"
+                  >
+                    <span className="text-blue-600 dark:text-blue-400 font-mono text-sm">
+                      {i + 1}.
+                    </span>
+                    <code className="text-sm font-mono text-gray-800 dark:text-gray-200">
+                      {formatCitation(citation)}
+                      {citation.functionName && (
+                        <span className="text-gray-500 dark:text-gray-400 ml-2">
+                          ({citation.functionName})
+                        </span>
+                      )}
+                    </code>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Purpose */}
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Purpose</h3>
+              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                {episodeData.purpose}
+              </p>
+            </div>
+
+            {/* Hotspots */}
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Key Hotspots</h3>
+              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                {episodeData.hotspots}
+              </p>
+            </div>
+
+            {/* Patterns */}
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Code Patterns</h3>
+              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                {episodeData.patterns}
+              </p>
+            </div>
+
+            {/* Micro-Task */}
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+              <h3 className="text-lg font-semibold mb-2">Micro-Task for Contributors</h3>
+              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                {episodeData.microTask}
+              </p>
+            </div>
+
+            {/* Note */}
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                <strong>Phase 0.2:</strong> Greptile Integration + Citation Enrichment Complete!
+                <br />
+                <strong>Next:</strong> Phase 0.3 - TTS Audio Generation
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Footer */}
         <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-          Phase 0.1: Foundation - UI Only (API integration coming in Phase 0.2)
+          Phase 0.2: Greptile Integration with Citation Fallback
         </p>
       </main>
     </div>
