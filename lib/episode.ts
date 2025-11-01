@@ -100,12 +100,22 @@ Generate the outline in JSON format. Ensure you use at least 3 of the citations 
   });
 
   // Parse JSON response
-  const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    throw new Error('LLM did not return valid JSON outline');
+  // Try to extract JSON from markdown code blocks or raw text
+  let jsonText = response.content;
+
+  // Remove markdown code blocks if present
+  const codeBlockMatch = jsonText.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+  if (codeBlockMatch) {
+    jsonText = codeBlockMatch[1];
+  } else {
+    // Try to find JSON object with balanced braces
+    const jsonMatch = jsonText.match(/\{(?:[^{}]|\{[^{}]*\})*\}/);
+    if (jsonMatch) {
+      jsonText = jsonMatch[0];
+    }
   }
 
-  const outline = JSON.parse(jsonMatch[0]);
+  const outline = JSON.parse(jsonText);
 
   // Add citations from original episode data
   return {
@@ -181,7 +191,7 @@ Write a natural, engaging dialogue between Greptice and Forky. Target 600-700 wo
 
   // Parse dialogue
   const dialogue = parseDialogue(response.content);
-  const wordCount = response.content.split(/\s+/).length;
+  const wordCount = dialogue.reduce((count, entry) => count + entry.text.split(/\s+/).length, 0);
   const estimatedDuration = Math.ceil((wordCount / 150) * 60); // 150 words per minute
 
   return {

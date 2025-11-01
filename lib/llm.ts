@@ -120,6 +120,6 @@ async function generateWithAnthropic(
   return {
     content: data.content[0].text,
     model: data.model,
-    tokensUsed: data.usage?.input_tokens + data.usage?.output_tokens,
+    tokensUsed: (data.usage?.input_tokens || 0) + (data.usage?.output_tokens || 0),
   };
 }
