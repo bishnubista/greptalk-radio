@@ -6,9 +6,11 @@
 
 ## Demo
 
-🎥 **[Watch Demo Video](https://drive.google.com/file/d/1oNUbcCc-55JB_6IfWGSHOViq_0xEMVk9/view?usp=sharing)**
+📦 **[Download Demo Files](https://github.com/bishnubista/greptalk-radio/releases/tag/hackathon-demo)**
 
-🎧 **[Listen to Sample Episode](https://drive.google.com/file/d/18eIfSyxtbGV29d6ucapePlIsAgMqIBvS/view?usp=sharing)** - SAFE-MCP repository episode
+🎥 **[Watch Demo Video](https://github.com/bishnubista/greptalk-radio/releases/download/hackathon-demo/greptalk-screenrecord.mov)** (33 MB)
+
+🎧 **[Listen to Sample Episode](https://github.com/bishnubista/greptalk-radio/releases/download/hackathon-demo/greptalk-SAFE-MCP-safe-mcp-episode.mp3)** - SAFE-MCP repository (3.7 MB)
 
 ---
 
