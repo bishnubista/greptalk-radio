@@ -4,6 +4,16 @@
 
 ---
 
+## Demo
+
+📦 **[Download Demo Files](https://github.com/bishnubista/greptalk-radio/releases/tag/hackathon-demo)**
+
+🎥 **[Watch Demo Video](https://github.com/bishnubista/greptalk-radio/releases/download/hackathon-demo/greptalk-screenrecord.mov)** (33 MB)
+
+🎧 **[Listen to Sample Episode](https://github.com/bishnubista/greptalk-radio/releases/download/hackathon-demo/greptalk-SAFE-MCP-safe-mcp-episode.mp3)** - SAFE-MCP repository (3.7 MB)
+
+---
+
 ## Overview
 
 Greptalk uses Greptile AI to analyze codebases and generates entertaining two-voice podcast episodes that:
